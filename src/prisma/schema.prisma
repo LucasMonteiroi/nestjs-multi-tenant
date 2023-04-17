@@ -9,3 +9,49 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id         String       @id @default(uuid())
+  name       String
+  username   String
+  email      String
+  password   String
+  active     Boolean      @default(false)
+  Membership Membership[]
+  Tasks      Task[]
+}
+
+model Plan {
+  id          String       @id @default(uuid())
+  name        String
+  period      Int
+  price       Decimal
+  maxRequests Int
+  active      Boolean      @default(false)
+  features    Feature[]
+  Membership  Membership[]
+}
+
+model Feature {
+  id          String      @id @default(uuid())
+  name        String
+  planId      String
+  plan        Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+  active      Boolean     @default(false)
+}
+
+model Membership {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId      String
+  plan        Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model Task {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
