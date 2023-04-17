@@ -586,6 +586,13 @@
           "description": "Add or update code related to validation.",
           "name": "safety-vest",
           "semver": null
+        },
+        {
+          "emoji": "🐋",
+          "code": ":whale::",
+          "description": "Add or update docker related files.",
+          "name": "docker",
+          "semver": null
         }
       ],
       "scopes": [
