@@ -19,6 +19,7 @@ model User {
   active     Boolean      @default(false)
   Membership Membership[]
   Tasks      Task[]
+  role       Role         @default(USER)
 }
 
 model Plan {
@@ -54,4 +55,9 @@ model Task {
   description String
   userId      String
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  USER
+  ADMIN
 }
