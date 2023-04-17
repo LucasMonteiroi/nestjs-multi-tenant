@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Feature, User } from '@prisma/client';
+import { Feature } from '@prisma/client';
 import { FeaturesRepository } from './features.repository';
 
 @Injectable()
