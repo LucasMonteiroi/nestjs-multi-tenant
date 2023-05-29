@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { CreateUserDto } from '../dtos/create-user.dto';
 import { UpdateUserDto } from '../dtos/update-user.dto';
 import { User } from '../entities/user.entity';
-import { UsersRepository } from '../users.repository';
+import { UsersRepository } from '../repositories/users.repository';
+import * as bcrypt from 'bcrypt'
+
+export const roundsOfHashing = 10;
 
 @Injectable()
 export class UsersService {
@@ -17,12 +20,27 @@ export class UsersService {
             password,
         } = createUserDto;
 
+        const userExists = await this.repository.getByParam({
+            where: {
+                username
+            }
+        })
+
+        if (userExists) {
+            throw new BadRequestException('User with this username already exists')
+        }
+
+        const hashedPassword = await bcrypt.hash(
+            password,
+            roundsOfHashing,
+        );
+
         const user = await this.repository.createUser({
             data: {
                 name,
                 username,
                 email,
-                password,
+                password: hashedPassword,
                 active: true,
                 role: Role.USER
             },
@@ -32,13 +50,13 @@ export class UsersService {
     }
 
     async updateUser(id: string, updateUserDto: UpdateUserDto) {
-    const {
-        name,
-        email,
-        password,
-        active,
-        role
-    } = updateUserDto;
+        const {
+            name,
+            email,
+            password,
+            active,
+            role
+        } = updateUserDto;
 
         const user = await this.repository.updateUser({
             where: {
@@ -47,7 +65,7 @@ export class UsersService {
             data: {
                 name,
                 email,
-                password,
+                password: password ? await bcrypt.hash(password, roundsOfHashing,) : password,
                 active,
                 role
             },
@@ -72,6 +90,14 @@ export class UsersService {
         });
 
         return user;
+    }
+
+    async getUserByUsername(username: string) {
+        return await this.repository.getByParam({
+            where: {
+                username
+            }
+        })
     }
 
     async getFilteredUsers(searchString: string) {

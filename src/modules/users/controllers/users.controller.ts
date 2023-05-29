@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UsePipes } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, UsePipes } from "@nestjs/common";
+import { JwtAuthGuard } from "src/auth/guards/jwt-auth.guard";
 import { CreateUserDto } from "../dtos/create-user.dto";
 import { UpdateUserDto } from "../dtos/update-user.dto";
 import { ExistsUserPipe } from "../pipes/exists-user-validation.pipe";
@@ -26,6 +27,7 @@ export class UsersController {
     }
 
     @Get()
+    @UseGuards(JwtAuthGuard)
     async getAll() {
         return await this.usersService.getUsers();
     }

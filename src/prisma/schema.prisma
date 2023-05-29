@@ -14,7 +14,7 @@ datasource db {
 model User {
   id         String       @id @default(uuid())
   name       String
-  username   String
+  username   String       @unique
   email      String
   password   String
   active     Boolean      @default(false)
@@ -36,7 +36,7 @@ model Plan {
 
 model Feature {
   id          String      @id @default(uuid())
-  name        String
+  name        String      @unique
   planId      String
   plan        Plan        @relation(fields: [planId], references: [id], onDelete: Cascade)
   active      Boolean     @default(false)

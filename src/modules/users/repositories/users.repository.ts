@@ -19,9 +19,10 @@ export class UsersRepository {
         cursor?: Prisma.UserWhereUniqueInput;
         where?: Prisma.UserWhereInput;
         orderBy?: Prisma.UserOrderByWithRelationInput;
+        include?: Prisma.UserInclude;
     }): Promise<User[]> {
-        const { skip, take, cursor, where, orderBy } = params;
-        return this.prisma.user.findMany({ skip, take, cursor, where, orderBy });
+        const { skip, take, cursor, where, orderBy, include } = params;
+        return this.prisma.user.findMany({ skip, take, cursor, where, orderBy, include });
     }
 
     async getUser(params: {
@@ -30,6 +31,18 @@ export class UsersRepository {
     }): Promise<User> {
         const { include, where } = params;
         return this.prisma.user.findUnique({ where, include });
+    }
+
+    async getByParam(params: {
+        skip?: number;
+        take?: number;
+        cursor?: Prisma.UserWhereUniqueInput;
+        where?: Prisma.UserWhereInput;
+        orderBy?: Prisma.UserOrderByWithRelationInput;
+        include?: Prisma.UserInclude;
+    }) {
+        const { skip, take, cursor, where, orderBy, include } = params;
+        return this.prisma.user.findFirst({ skip, take, cursor, where, orderBy, include });
     }
 
     async updateUser(params: {
