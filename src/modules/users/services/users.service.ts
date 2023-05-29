@@ -1,28 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
-import { UsersRepository } from './users.repository';
+import { Role } from '@prisma/client';
+import { CreateUserDto } from '../dtos/create-user.dto';
+import { UpdateUserDto } from '../dtos/update-user.dto';
+import { User } from '../entities/user.entity';
+import { UsersRepository } from '../users.repository';
 
 @Injectable()
 export class UsersService {
     constructor(private repository: UsersRepository) { }
 
-    async createUser(
-        params: {
-            name: User[`name`];
-            username: User[`username`];
-            email: User[`email`];
-            password: User[`password`];
-            active: User[`active`];
-            role: User[`role`]
-        }) {
+    async createUser(createUserDto: CreateUserDto): Promise<User> {
         const {
             name,
             username,
             email,
             password,
-            active,
-            role
-        } = params;
+        } = createUserDto;
 
         const user = await this.repository.createUser({
             data: {
@@ -30,30 +23,22 @@ export class UsersService {
                 username,
                 email,
                 password,
-                active,
-                role
+                active: true,
+                role: Role.USER
             },
         });
 
         return user;
     }
 
-    async updateUser(params: {
-        id: User[`id`];
-        name: User[`name`];
-        email: User[`email`];
-        password: User[`password`];
-        active: User[`active`];
-        role: User[`role`]
-    }) {
+    async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const {
-        id,
         name,
         email,
         password,
         active,
         role
-    } = params;
+    } = updateUserDto;
 
         const user = await this.repository.updateUser({
             where: {
@@ -68,6 +53,8 @@ export class UsersService {
             },
         });
 
+        delete user.password;
+
         return user;
     }
 
@@ -75,6 +62,16 @@ export class UsersService {
         const users = await this.repository.getUsers({});
 
         return users;
+    }
+
+    async getUserById(id: string) {
+        const user = await this.repository.getUser({
+            where: {
+                id
+            }
+        });
+
+        return user;
     }
 
     async getFilteredUsers(searchString: string) {
@@ -88,13 +85,11 @@ export class UsersService {
 
     }
 
-    async deleteUser(params: { userId: User['id'] }) {
-        const { userId } = params;
+    async deleteUser(id: string) {
         const deleted = await this.repository.deleteUser({
             where: {
-                id: userId
+                id
             }
         });
-        console.log(deleted);
     }
 }
